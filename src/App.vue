@@ -2,37 +2,40 @@
   <div class="container">
     <h2>Tasks manager</h2>
     <tasks-list-filter
-      v-on:filter-sort-change="filterOrSortChange"
+      @filter-sort-change="filterOrSortChange"
     />
     <md-list>
-      <template v-for="(task, index) in filteredTasks">
+      <template v-for="(task, index) in filteredTasks">
         <tasks-list-item
-          v-bind:key="task.id"
-          v-bind:task="task"
-          v-bind:user="usersById[task.user_id]"
-          v-on:remove-task="onOpenConfirmRemoveDialog"
-          v-on:open-edit-dialog="openEditDialog"
+          :key="task.id"
+          :task="task"
+          :user="usersById[task.user_id]"
+          @remove-task="onOpenConfirmRemoveDialog"
+          @open-edit-dialog="openEditDialog"
         />
-        <md-divider v-bind:key="task.id + 'divider'" v-if="tasks.length - 1 !== index"></md-divider>
+        <md-divider
+          v-if="tasks.length - 1 !== index"
+          :key="task.id + 'divider'" 
+        />
       </template> 
     </md-list>
     <div class="md-layout list-bottom-bar">
       <div class="md-layout-item">
         <tasks-list-total
-          v-bind:tasks="filteredTasks"
+          :tasks="filteredTasks"
         />
       </div>
       <div class="md-layout-item md-layout md-size-50 md-alignment-center-right">
         <md-button
+          :disabled="disableCahngeControls"
           class="md-layout-item md-raised"
-          v-bind:disabled="disableCahngeControls"
           @click="onCancelChanges"
         >
           Сancel changes
         </md-button>
         <md-button
+          :disabled="disableCahngeControls"
           class="md-layout-item md-raised md-primary"
-          v-bind:disabled="disableCahngeControls"
           @click="onSaveChanges"
         >
           Save changes
@@ -43,14 +46,23 @@
       <md-dialog-title>Edit task</md-dialog-title>
       <md-dialog-content>
         <task-edit-form
-          v-bind:task="edit.editableTask"
-          v-bind:usersById="usersById"
-        >
-        </task-edit-form>
+          :task="edit.editableTask"
+          :usersById="usersById"
+        />
       </md-dialog-content>
       <md-dialog-actions>
-        <md-button class="md-primary" @click="closeEditDialog">Close</md-button>
-        <md-button class="md-primary" @click="okEditDialog">Ok</md-button>
+        <md-button
+          class="md-primary"
+          @click="closeEditDialog"
+        >
+          Close
+        </md-button>
+        <md-button
+          class="md-primary"
+          @click="okEditDialog"
+        >
+          Ok
+        </md-button>
       </md-dialog-actions>
     </md-dialog>
     <md-dialog-confirm
@@ -61,9 +73,18 @@
       @md-cancel="onCancelConfirmRemoveDialog"
       @md-confirm="removeTask"
     />
-    <md-snackbar md-position="center" :md-duration="4000" :md-active.sync="showSnackbar">
+    <md-snackbar
+      :md-duration="4000"
+      :md-active.sync="showSnackbar"
+      md-position="center"
+    >
       <span>Fake server request! Check request data in console.</span>
-      <md-button class="md-primary" @click="showSnackbar = false">Retry</md-button>
+      <md-button
+        class="md-primary"
+        @click="showSnackbar = false"
+      >
+        Retry
+      </md-button>
     </md-snackbar>
   </div>
 </template>
@@ -104,79 +125,6 @@ export default {
         editableTask: null,
         editedTasks: {}
       }
-    }
-  },
-
-  methods: {
-    onOpenConfirmRemoveDialog: function(id) {
-      this.del.deleteId = id;
-      this.del.confirmDeleteDialogOpen = true;
-    },
-    removeTask: function() {
-      const taskId = this.del.deleteId;
-
-      // in this place there must be a real request to the server
-      console.log("In this case, the data is sent in the URL");
-      this.showSnackbar = true;
-
-      const index = this.tasks.findIndex((task) => {
-        return taskId === task.id
-      });
-      if (index !== -1) {
-        this.$delete(this.tasks, index);
-      }
-      this.del.deleteId = null;
-    },
-    onCancelConfirmRemoveDialog: function() {
-      this.del.deleteId = null;
-      this.del.confirmDeleteDialogOpen = false;
-    },
-    onCancelChanges: function() {
-      this.$set(this.edit, "editedTasks", {});
-    },
-    onSaveChanges: function() {
-      // in this place there must be a real request to the server
-      console.log("In this case, the data is sent in the URL");
-      this.showSnackbar = true;
-      console.log("Edit task:");
-      console.log(JSON.parse(JSON.stringify(Object.values(this.edit.editedTasks))));
-
-      this.tasks.forEach((task, index) => {
-        if (this.edit.editedTasks[task.id]) {
-          this.$set(this.tasks, index, this.edit.editedTasks[task.id]);
-        }
-      });
-      this.$set(this.edit, "editedTasks", {});
-    },
-    openEditDialog: function(taskId) {
-      this.edit.editDialogOpen = true;
-      const taskIndex = this.filteredTasks.findIndex((task) => {
-        return taskId === task.id
-      });
-      this.$set(this.edit, "editableTask", JSON.parse(JSON.stringify(this.filteredTasks[taskIndex])));
-    },
-    closeEditDialog: function() {
-      this.edit.editDialogOpen = false;
-      this.edit.editableTask = null;
-    },
-    okEditDialog: function() {
-      const editedTask = this.edit.editableTask;
-      const originalTask = this.tasks.find((task) => {
-        return editedTask.id === task.id;
-      });
-      if (!isEqual(editedTask, originalTask)) {
-        this.$set(this.edit.editedTasks, editedTask.id, editedTask);
-      }
-      else {
-        this.$delete(this.edit.editedTasks, editedTask.id);
-      }
-      this.edit.editDialogOpen = false;
-      this.edit.editableTask = null;
-    },
-    filterOrSortChange(data) {
-      this.orderDesc = data.orderDesc;
-      this.sortBy = data.sortBy;
-      this.filter = data.filter;
     }
   },
 
@@ -266,6 +214,79 @@ export default {
         this.tasks = data.tasks;
       }
     )
+  },
+
+  methods: {
+    onOpenConfirmRemoveDialog: function(id) {
+      this.del.deleteId = id;
+      this.del.confirmDeleteDialogOpen = true;
+    },
+    removeTask: function() {
+      const taskId = this.del.deleteId;
+
+      // in this place there must be a real request to the server
+      console.log("In this case, the data is sent in the URL");
+      this.showSnackbar = true;
+
+      const index = this.tasks.findIndex((task) => {
+        return taskId === task.id
+      });
+      if (index !== -1) {
+        this.$delete(this.tasks, index);
+      }
+      this.del.deleteId = null;
+    },
+    onCancelConfirmRemoveDialog: function() {
+      this.del.deleteId = null;
+      this.del.confirmDeleteDialogOpen = false;
+    },
+    onCancelChanges: function() {
+      this.$set(this.edit, "editedTasks", {});
+    },
+    onSaveChanges: function() {
+      // in this place there must be a real request to the server
+      console.log("In this case, the data is sent in the URL");
+      this.showSnackbar = true;
+      console.log("Edit task:");
+      console.log(JSON.parse(JSON.stringify(Object.values(this.edit.editedTasks))));
+
+      this.tasks.forEach((task, index) => {
+        if (this.edit.editedTasks[task.id]) {
+          this.$set(this.tasks, index, this.edit.editedTasks[task.id]);
+        }
+      });
+      this.$set(this.edit, "editedTasks", {});
+    },
+    openEditDialog: function(taskId) {
+      this.edit.editDialogOpen = true;
+      const taskIndex = this.filteredTasks.findIndex((task) => {
+        return taskId === task.id
+      });
+      this.$set(this.edit, "editableTask", JSON.parse(JSON.stringify(this.filteredTasks[taskIndex])));
+    },
+    closeEditDialog: function() {
+      this.edit.editDialogOpen = false;
+      this.edit.editableTask = null;
+    },
+    okEditDialog: function() {
+      const editedTask = this.edit.editableTask;
+      const originalTask = this.tasks.find((task) => {
+        return editedTask.id === task.id;
+      });
+      if (!isEqual(editedTask, originalTask)) {
+        this.$set(this.edit.editedTasks, editedTask.id, editedTask);
+      }
+      else {
+        this.$delete(this.edit.editedTasks, editedTask.id);
+      }
+      this.edit.editDialogOpen = false;
+      this.edit.editableTask = null;
+    },
+    filterOrSortChange(data) {
+      this.orderDesc = data.orderDesc;
+      this.sortBy = data.sortBy;
+      this.filter = data.filter;
+    }
   }
 }
 </script>

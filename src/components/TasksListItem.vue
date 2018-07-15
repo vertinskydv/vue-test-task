@@ -1,23 +1,23 @@
 <template>
   <md-list-item class="list-item">
     <p class="list-item__name-col">
-      <span class="md-body-2">Task: {{task.name}}</span><br>
-      <span class="md-caption">User: {{user.name}}</span>
+      <span class="md-body-2">Task: {{ task.name }}</span><br>
+      <span class="md-caption">User: {{ user.name }}</span>
     </p>
     <p class="list-item__name-col">
-      <span class="md-body-1">Spent time: {{task.time}}h</span><br>
-      <span class="md-body-1">Cost of work: {{task.cost}}</span>
+      <span class="md-body-1">Spent time: {{ task.time }}h</span><br>
+      <span class="md-body-1">Cost of work: {{ task.cost }}</span>
     </p>
     <div>
       <md-button
         class="md-icon-button"
-        v-on:click="$emit('open-edit-dialog', task.id)"
+        @click="$emit('open-edit-dialog', task.id)"
       >
         <md-icon>edit</md-icon>
       </md-button>
       <md-button
         class="md-icon-button"
-        v-on:click="$emit('remove-task', task.id)"
+        @click="$emit('remove-task', task.id)"
       >
         <md-icon>delete</md-icon>
       </md-button>
@@ -31,10 +31,10 @@
 
   export default {
     name: "tasks-list-item",
-    props: [
-      "task",
-      "user"
-    ],
+    props: {
+      task: Object,
+      user: Object
+    },
   };
 </script>
 

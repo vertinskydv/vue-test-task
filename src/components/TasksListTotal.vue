@@ -1,8 +1,8 @@
 <template>
   <div>
     <span class="md-body-2">
-      Total time: {{totalSpentTime}}h<br>
-      Total cost of work: {{totalCostOfWork}}
+      Total time: {{ totalSpentTime }}h<br>
+      Total cost of work: {{ totalCostOfWork }}
     </span>
   </div>
 </template>

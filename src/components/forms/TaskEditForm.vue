@@ -9,28 +9,31 @@
       <md-select v-model="task.user_id">
         <md-option
           v-for="user in usersById"
-          v-bind:key="user.id"
-          v-bind:value="user.id"
+          :key="user.id"
+          :value="user.id"
         >
-          {{user.name}}
+          {{ user.name }}
         </md-option>
       </md-select>
     </md-field>
     <md-field md-dynamic-height>
       <label>Spent time</label>
-      <md-input type="number" v-model.number="task.time" />
+      <md-input
+        v-model.number="task.time"
+        type="number"
+      />
     </md-field>
-    <span class="md-subheading">Cost of work: {{task.cost}}</span>
+    <span class="md-subheading">Cost of work: {{ task.cost }}</span>
   </div>
 </template>
 
 <script>
   export default {
     name: "task-edit-form",
-    props: [
-      "usersById",
-      "task"
-    ],
+    props: {
+      usersById: Object,
+      task: Object
+    },
     watch: {
       "task.user_id": function() {
         this.recountCost();

@@ -7,7 +7,7 @@
           <md-input
             id="filter-input"
             v-model="filter"
-          ></md-input>
+          />
         </md-field>
       </div>
       <div class="md-layout-item">
@@ -22,7 +22,12 @@
         </md-field>
       </div>
       <div class="md-layout-item">
-        <md-switch v-model="orderDesc" class="md-primary">{{orderDesc ? "Descending" : "Ascending"}}</md-switch>
+        <md-switch
+          v-model="orderDesc"
+          class="md-primary"
+        >
+          {{ orderDesc ? "Descending" : "Ascending" }}
+        </md-switch>
       </div>
     </div>
   </div>
